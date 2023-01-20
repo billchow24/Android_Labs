@@ -3,4 +3,6 @@
     <string name="app_name">Shing\'s Android Labs</string>
     <string name="hello_message">世界你好!</string>
     <string name="button_message">我係一個掣</string>
+    <string name="editmessage">"我係 EditText"</string>
+    <string name="hinttext">"寫啲嘢"</string>
 </resources>
