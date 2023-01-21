@@ -1,6 +1,7 @@
 package algonquin.cst2335.chow0144.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -21,16 +22,24 @@ public class MainActivity extends AppCompatActivity {
         variableBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(variableBinding.getRoot());
 
-        variableBinding.mytext.setText((CharSequence) model.editString);
+        //variableBinding.mytext.setText(model.editString);
         variableBinding.mybutton.setOnClickListener(click ->
         {
-            model.editString.postValue(variableBinding.myedittext.getText().toString());
+            // Before Live Data
+            //model.editString = variableBinding.myedittext.getText().toString();
             //variableBinding.mytext.setText("Your edit text has: " + model.editString);
+
+            // After Live Data
+            model.editString.postValue(variableBinding.myedittext.getText().toString());
+
 
         });
 
-        model.editString.observe(this, s->{
-            variableBinding.myedittext.setText("Your edit text has: "+s);
+        model.editString.observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                variableBinding.mytext.setText("Your edit text has:" + s);
+            }
         });
         //btn.setOnClickListener(new View.OnClickListener() {
         //    @Override
