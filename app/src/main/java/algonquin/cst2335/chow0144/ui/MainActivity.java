@@ -4,7 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import algonquin.cst2335.chow0144.databinding.ActivityMainBinding;
 import algonquin.cst2335.chow0144.data.MainViewModel;
@@ -22,33 +26,41 @@ public class MainActivity extends AppCompatActivity {
         variableBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(variableBinding.getRoot());
 
-        //variableBinding.mytext.setText(model.editString);
+
         variableBinding.mybutton.setOnClickListener(click ->
         {
-            // Before Live Data
-            //model.editString = variableBinding.myedittext.getText().toString();
-            //variableBinding.mytext.setText("Your edit text has: " + model.editString);
 
-            // After Live Data
             model.editString.postValue(variableBinding.myedittext.getText().toString());
-
-
         });
 
-        model.editString.observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
+        model.editString.observe(this, s ->{
                 variableBinding.mytext.setText("Your edit text has:" + s);
-            }
         });
-        //btn.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View view) {
-        //        String editString = myedit.getText().toString();
-        //        mytext.setText( "Your edit text has: " + editString);
-        //    }
-        //});
-        //String editString = myedit.getText().toString();
-        //btn.setOnClickListener(   vw  ->  mytext.setText("Your edit text has: " + editString)    );
+
+        model.isSelected.observe(this, selected -> {
+
+            variableBinding.checkbox.setChecked(selected);
+            variableBinding.radioButton.setChecked(selected);
+            variableBinding.switch1.setChecked(selected);
+
+            Context context = getApplicationContext();
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, "The value is now: " + selected, duration);
+            toast.show();
+        });
+
+        variableBinding.checkbox.setOnCheckedChangeListener((CompoundButton chBox, boolean isChecked)->{
+            model.isSelected.postValue(isChecked);
+        });
+
+        variableBinding.switch1.setOnCheckedChangeListener((CompoundButton swith1, boolean isChecked)->{
+            model.isSelected.postValue(isChecked);
+        });
+
+        variableBinding.radioButton.setOnCheckedChangeListener((CompoundButton radioBtn, boolean isChecked)->{
+            model.isSelected.postValue(isChecked);
+        });
+
     }
 }
