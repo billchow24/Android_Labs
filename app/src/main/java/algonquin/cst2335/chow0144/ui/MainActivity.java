@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         variableBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(variableBinding.getRoot());
 
-
+        // Button Click Event
         variableBinding.mybutton.setOnClickListener(click ->
         {
 
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
                 variableBinding.mytext.setText("Your edit text has:" + s);
         });
 
+        // Box selection Event
         model.isSelected.observe(this, selected -> {
 
             variableBinding.checkbox.setChecked(selected);
@@ -62,5 +63,18 @@ public class MainActivity extends AppCompatActivity {
             model.isSelected.postValue(isChecked);
         });
 
+        //Image Click Event
+        variableBinding.imgView.setOnClickListener(click->{
+
+        });
+
+        variableBinding.myimagebutton.setOnClickListener(click->{
+            Context context = getApplicationContext();
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, "The width = " + variableBinding.myimagebutton.getWidth()
+                    + " and height = " + variableBinding.myimagebutton.getHeight(), duration);
+            toast.show();
+        });
     }
 }

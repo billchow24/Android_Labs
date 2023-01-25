@@ -44,5 +44,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Do you drink coffee?" />
-    
+
+
+    <ImageView
+        android:id="@+id/imgView"
+        android:src="@drawable/logo_algonquin"
+        android:layout_width="1000px"
+        android:layout_height="200px" />
+
+    <ImageButton
+        android:id="@+id/myimagebutton"
+        android:src="@drawable/logo_algonquin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         />
+
+
 </LinearLayout>
