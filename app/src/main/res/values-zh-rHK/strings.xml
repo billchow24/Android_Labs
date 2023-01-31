@@ -3,4 +3,8 @@
     <string name="app_name">Shing\'s Android Labs</string>
     <string name="hello_message">世界你好!</string>
     <string name="button_message">我係一個掣</string>
+    <string name="spin_message">轉國旗</string>
+    <string name="button1">掣1</string>
+    <string name="button2">掣2</string>
+    <string name="button3">掣3</string>
 </resources>
