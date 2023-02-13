@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Shing\'s Android Labs</string>
-    <string name="hello_message">Hello World!</string>
-    <string name="button_message">I\'m a button</string>
+    <string name="enter_email_message">Enter your email address:</string>
+    <string name="enter_pw_message">Type your password:</string>
+    <string name="button_message">Login</string>
 </resources>
