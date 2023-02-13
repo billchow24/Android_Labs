@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,6 +23,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class SecondActivity extends AppCompatActivity {
 
@@ -37,6 +42,7 @@ public class SecondActivity extends AppCompatActivity {
         String emailAddress = fromPrevious.getStringExtra("EmailAddress");
 
         TextView welcomeMsg = findViewById(R.id.textView);
+        ImageView profileImage = findViewById(R.id.imageView2);
         welcomeMsg.setText("Welcome " + emailAddress);
 
         cameraResult = registerForActivityResult(
@@ -49,11 +55,31 @@ public class SecondActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Captured", Toast.LENGTH_SHORT).show();
                             Intent data = result.getData();
                             Bitmap thumbnail = data.getParcelableExtra("data");
-                            ImageView profileImage = findViewById(R.id.imageView2);
                             profileImage.setImageBitmap(thumbnail);
+
+                            FileOutputStream fOut = null;
+                            try { fOut = openFileOutput("Picture.png", Context.MODE_PRIVATE);
+                                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                                fOut.flush();
+                                fOut.close();
+                            }
+                            catch ( IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
+
+
+        File file = new File( getFilesDir(), "Picture.png");
+        if(file.exists()) {
+            try {
+                Bitmap theImage = BitmapFactory.decodeStream(openFileInput("Picture.png"));
+                profileImage.setImageBitmap(theImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
