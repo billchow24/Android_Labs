@@ -2,7 +2,9 @@ package algonquin.cst2335.chow0144;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -11,13 +13,19 @@ import android.widget.EditText;
 public class MainActivity extends AppCompatActivity {
 
     private static String TAG = "MainActivity";
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        EditText emailEditText = findViewById(R.id.email_text);
+
         Log.w( "TAG", "First function that gets created when an application is launched." );
+        prefs = getSharedPreferences("MyData", Context.MODE_PRIVATE);
+        String emailAddress = prefs.getString("LoginName", "");
+        emailEditText.setText(emailAddress);
     }
 
     @Override
@@ -30,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         EditText emailEditText = findViewById(R.id.email_text);
 
         loginButton.setOnClickListener( clk-> {
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("LoginName", emailEditText.getText().toString());
+            editor.apply();
+
             Intent nextPage = new Intent( MainActivity.this, SecondActivity.class);
             nextPage.putExtra("EmailAddress", emailEditText.getText().toString());
             startActivity(nextPage);
