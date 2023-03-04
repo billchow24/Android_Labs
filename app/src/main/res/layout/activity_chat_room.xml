@@ -28,11 +28,22 @@
 
     <EditText
         android:id="@+id/textInput"
-        android:layout_width="321dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/receiveButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/sendButton"
+        app:layout_constraintTop_toTopOf="@+id/sendButton" />
+
+    <Button
+        android:id="@+id/receiveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Receive"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

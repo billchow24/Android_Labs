@@ -7,19 +7,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import algonquin.cst2335.chow0144.databinding.ActivityChatRoomBinding;
+import algonquin.cst2335.chow0144.databinding.ReceiveMessageBinding;
 import algonquin.cst2335.chow0144.databinding.SentMessageBinding;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ChatRoom extends AppCompatActivity {
     ActivityChatRoomBinding binding;
     ChatRoomViewModel chatModel;
-    ArrayList<String> messages = new ArrayList<>();
+    ArrayList<ChatMessage> messages = new ArrayList<>();
     private RecyclerView.Adapter myAdapter;
 
     @Override
@@ -32,11 +36,23 @@ public class ChatRoom extends AppCompatActivity {
 
         if(messages == null)
         {
-            chatModel.messages.postValue( messages = new ArrayList<String>());
+            chatModel.messages.postValue( messages = new ArrayList<ChatMessage>());
         }
 
         binding.sendButton.setOnClickListener(click->{
-            messages.add(binding.textInput.getText().toString());
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd-MMM-yyyy hh-mm-ss a");
+            String currentDateandTime = sdf.format(new Date());
+            ChatMessage message = new ChatMessage(binding.textInput.getText().toString(), currentDateandTime, true);
+            messages.add(message);
+            myAdapter.notifyItemInserted(messages.size()-1);
+            binding.textInput.setText("");
+        });
+
+        binding.receiveButton.setOnClickListener(click->{
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd-MMM-yyyy hh-mm-ss a");
+            String currentDateandTime = sdf.format(new Date());
+            ChatMessage message = new ChatMessage(binding.textInput.getText().toString(), currentDateandTime, false);
+            messages.add(message);
             myAdapter.notifyItemInserted(messages.size()-1);
             binding.textInput.setText("");
         });
@@ -58,15 +74,20 @@ public class ChatRoom extends AppCompatActivity {
             @NonNull
             @Override
             public MyRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                SentMessageBinding binding = SentMessageBinding.inflate(getLayoutInflater());
-                return new MyRowHolder(binding.getRoot());
+                if(viewType == 0){
+                    SentMessageBinding binding = SentMessageBinding.inflate(getLayoutInflater());
+                    return new MyRowHolder(binding.getRoot());
+                }else{
+                    ReceiveMessageBinding binding = ReceiveMessageBinding.inflate(getLayoutInflater());
+                    return new MyRowHolder(binding.getRoot());
+                }
             }
 
             @Override
             public void onBindViewHolder(@NonNull MyRowHolder  holder, int position) {
-                String obj = messages.get(position);
-                holder.messageText.setText(obj);
-                holder.timeText.setText("");
+                ChatMessage obj = messages.get(position);
+                holder.messageText.setText(obj.getMessage());
+                holder.timeText.setText(obj.getTimeSent());
             }
 
             @Override
@@ -75,7 +96,12 @@ public class ChatRoom extends AppCompatActivity {
             }
 
             public int getItemViewType(int position){
-                return 0;
+                ChatMessage obj = messages.get(position);
+                if(obj.getIsSentButton()){
+                    return 0;
+                } else {
+                    return 1;
+                }
             }
         });
     }
