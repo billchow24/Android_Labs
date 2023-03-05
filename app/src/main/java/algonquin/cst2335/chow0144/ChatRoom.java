@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import algonquin.cst2335.chow0144.databinding.ActivityChatRoomBinding;
 import algonquin.cst2335.chow0144.databinding.ReceiveMessageBinding;
@@ -19,11 +20,14 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ChatRoom extends AppCompatActivity {
     ActivityChatRoomBinding binding;
     ChatRoomViewModel chatModel;
     ArrayList<ChatMessage> messages = new ArrayList<>();
+    ChatMessageDAO mDAO;
     private RecyclerView.Adapter myAdapter;
 
     @Override
@@ -32,11 +36,21 @@ public class ChatRoom extends AppCompatActivity {
         binding = ActivityChatRoomBinding.inflate(getLayoutInflater());
         chatModel = new ViewModelProvider(this).get(ChatRoomViewModel.class);
         messages = chatModel.messages.getValue();
+        MessageDatabase db = Room.databaseBuilder(getApplicationContext(), MessageDatabase.class, "ChatMessage").build();
+        mDAO = db.cmDAO();
         setContentView(binding.getRoot());
 
         if(messages == null)
         {
-            chatModel.messages.postValue( messages = new ArrayList<ChatMessage>());
+            chatModel.messages.setValue(messages = new ArrayList<>());
+
+            Executor thread = Executors.newSingleThreadExecutor();
+            thread.execute(() ->
+            {
+                messages.addAll( mDAO.getAllMessages() ); //Once you get the data from database
+
+                runOnUiThread( () ->  binding.recycleView.setAdapter( myAdapter )); //You can then load the RecyclerView
+            });
         }
 
         binding.sendButton.setOnClickListener(click->{
@@ -46,6 +60,12 @@ public class ChatRoom extends AppCompatActivity {
             messages.add(message);
             myAdapter.notifyItemInserted(messages.size()-1);
             binding.textInput.setText("");
+
+            Executor thread = Executors.newSingleThreadExecutor();
+            thread.execute(() ->
+            {
+                mDAO.insertMessage(message);
+            });
         });
 
         binding.receiveButton.setOnClickListener(click->{
@@ -55,6 +75,12 @@ public class ChatRoom extends AppCompatActivity {
             messages.add(message);
             myAdapter.notifyItemInserted(messages.size()-1);
             binding.textInput.setText("");
+
+            Executor thread = Executors.newSingleThreadExecutor();
+            thread.execute(() ->
+            {
+                mDAO.insertMessage(message);
+            });
         });
 
         class MyRowHolder extends RecyclerView.ViewHolder {
