@@ -1,6 +1,7 @@
 package algonquin.cst2335.chow0144;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,12 +18,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+/**
+ * ChatRoom class is an Activity class that represents a chatroom view that has a RecyclerView to display
+ * chat messages, and two buttons (send and receive) to allow users to add messages to the chat. This class
+ * also has a ChatRoomViewModel to store chat messages and a ChatMessageDAO to handle database operations.
+ */
 public class ChatRoom extends AppCompatActivity {
     ActivityChatRoomBinding binding;
     ChatRoomViewModel chatModel;
@@ -30,6 +38,10 @@ public class ChatRoom extends AppCompatActivity {
     ChatMessageDAO mDAO;
     private RecyclerView.Adapter myAdapter;
 
+    /** Called when the activity is starting. This method initializes view objects, reads chat messages from
+     * the database, sets up click listeners for buttons, and configures the RecyclerView.
+     * @param savedInstanceState Bundle object containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,12 +95,48 @@ public class ChatRoom extends AppCompatActivity {
             });
         });
 
+        /**
+         * MyRowHolder is an inner class that extends RecyclerView.ViewHolder and provides a reference to the UI
+         * elements that represent a chat message in the RecyclerView.
+         * Properties:
+         * messageText: TextView that displays the message text
+         * timeText: TextView that displays the message timestamp
+         * Methods:
+         * MyRowHolder(View itemView): constructor that initializes the messageText and timeText properties
+         * and sets up a click listener to handle the deletion of the message
+         */
         class MyRowHolder extends RecyclerView.ViewHolder {
             TextView messageText;
             TextView timeText;
 
             public MyRowHolder(@NonNull View itemView) {
                 super(itemView);
+
+                itemView.setOnClickListener(clk->{
+                    int position = getAdapterPosition();
+                    AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
+                    builder.setTitle("Question:")
+                    .setMessage("Do you want to delete the message: "+messageText.getText() )
+                    .setNegativeButton("No",(dialog, cl) ->{})
+                    .setPositiveButton("Yes",(dialog, cl) -> {
+                        Executor thread = Executors.newSingleThreadExecutor();
+                        ChatMessage m = messages.get(position);
+                        thread.execute(() ->
+                                {
+                                    mDAO.deleteMessage(m);
+                                });
+                        messages.remove(position);
+                        myAdapter.notifyItemRemoved(position);
+                        Snackbar.make(messageText,"You deleted message #"+ position, Snackbar.LENGTH_LONG)
+                                .setAction("Undo",click ->{
+                                    messages.add(position, m);
+                                    myAdapter.notifyItemInserted(position);
+                                })
+                                .show();
+                    })
+                    .create().show();
+                });
+
                 messageText = itemView.findViewById(R.id.message);
                 timeText = itemView.findViewById(R.id.time);
             }
