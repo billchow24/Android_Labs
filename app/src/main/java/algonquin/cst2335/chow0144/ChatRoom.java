@@ -3,6 +3,8 @@ package algonquin.cst2335.chow0144;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -149,7 +151,12 @@ public class ChatRoom extends AppCompatActivity {
         }
 
         chatModel.selectedMessage.observe(this, (newMessageValue) -> {
-
+            FragmentManager fMgr = getSupportFragmentManager();
+            FragmentTransaction tx = fMgr.beginTransaction();
+            MessageDetailsFragment chatFragment = new MessageDetailsFragment( newMessageValue );
+            tx.replace(R.id.fragmentLocation, chatFragment);
+            tx.addToBackStack("");
+            tx.commit();
         });
 
         binding.recycleView.setLayoutManager(new LinearLayoutManager(this));
