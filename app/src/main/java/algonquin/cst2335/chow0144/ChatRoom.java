@@ -14,13 +14,16 @@ import algonquin.cst2335.chow0144.databinding.ActivityChatRoomBinding;
 import algonquin.cst2335.chow0144.databinding.ReceiveMessageBinding;
 import algonquin.cst2335.chow0144.databinding.SentMessageBinding;
 
+import android.app.Instrumentation;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -36,6 +39,7 @@ import java.util.concurrent.Executors;
  * also has a ChatRoomViewModel to store chat messages and a ChatMessageDAO to handle database operations.
  */
 public class ChatRoom extends AppCompatActivity {
+    Instrumentation instrumentation = new Instrumentation();
     ActivityChatRoomBinding binding;
     ChatRoomViewModel chatModel;
     ArrayList<ChatMessage> messages = new ArrayList<>();
@@ -55,14 +59,13 @@ public class ChatRoom extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        TextView messageText = null;
-
         switch( item.getItemId() )
         {
             case R.id.item_1:
 
                 //put your ChatMessage deletion code here. If you select this item, you should show the alert dialog
                 //asking if the user wants to delete this message.
+
                 AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
                 builder.setTitle("Question:")
                         .setMessage("Do you want to delete the message?")
@@ -76,14 +79,18 @@ public class ChatRoom extends AppCompatActivity {
                             });
                             messages.remove(position);
                             myAdapter.notifyItemRemoved(position);
-                            /*Snackbar.make(messageText,"You deleted message #"+ position, Snackbar.LENGTH_LONG)
+                            Snackbar.make(findViewById(R.id.message),"You deleted message #"+ position, Snackbar.LENGTH_LONG)
                                     .setAction("Undo",click ->{
                                         messages.add(position, m);
                                         myAdapter.notifyItemInserted(position);
                                     })
-                                    .show();*/
+                                    .show();
                         })
                         .create().show();
+                break;
+
+            case R.id.about:
+                Toast.makeText(getApplicationContext(), "Version 1.0, created by Shing Kwan Chow", Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;
