@@ -76,12 +76,12 @@ public class ChatRoom extends AppCompatActivity {
                             });
                             messages.remove(position);
                             myAdapter.notifyItemRemoved(position);
-                            Snackbar.make(messageText,"You deleted message #"+ position, Snackbar.LENGTH_LONG)
+                            /*Snackbar.make(messageText,"You deleted message #"+ position, Snackbar.LENGTH_LONG)
                                     .setAction("Undo",click ->{
                                         messages.add(position, m);
                                         myAdapter.notifyItemInserted(position);
                                     })
-                                    .show();
+                                    .show();*/
                         })
                         .create().show();
                 break;
