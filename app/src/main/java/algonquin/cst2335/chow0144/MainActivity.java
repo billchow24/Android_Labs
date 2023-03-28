@@ -2,11 +2,35 @@ package algonquin.cst2335.chow0144;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DownloadManager;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import algonquin.cst2335.chow0144.databinding.ActivityMainBinding;
 
 /**
  * The MainActivity class is the main activity of the password checker app. It includes a TextView
@@ -17,32 +41,103 @@ import android.widget.Toast;
  */
 public class MainActivity extends AppCompatActivity {
 
-    /** This holds the text at the centre of the screen*/
-    TextView tv = null;
-    /** This holds the edit text box for passwords input*/
-    EditText et = null;
-    /** This is the login button*/
-    Button btn = null;
+    protected String cityName;
+    protected RequestQueue queue = null;
+
+    private void loadImage(String iconName) {
+        String imageUrl = "https://openweathermap.org/img/w/" + iconName + ".png";
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        queue = Volley.newRequestQueue(this);
 
-        tv = findViewById(R.id.pwMsgTextView);
-        et = findViewById(R.id.pwEditText);
-        btn = findViewById(R.id.pwButton);
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        btn.setOnClickListener(clk ->{
-            String password = et.getText().toString();
+        binding.getForecast.setOnClickListener(clk->{
+            cityName = binding.editText.getText().toString();
+            String stringURL = null;
+            final String[] iconName = new String[1];
 
-            if (checkPasswordComplexity(password)){
-                tv.setText("Your password meets the requirements");
-            }else{
-                tv.setText("You shall not pass!");
+            try {
+                stringURL = "https://api.openweathermap.org/data/2.5/weather?q=" + URLEncoder.encode(cityName,"UTF-8")+"&appid=749a132a1ed8ac34586506dd92981ed8&units=metric";
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
 
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, stringURL, null,
+                    (response) -> {
+                        try {
+                            JSONObject coord = response.getJSONObject("coord");
+                            JSONArray weatherArray = response.getJSONArray ( "weather" );
+                            JSONObject position0 = weatherArray.getJSONObject(0);
+                            String description = position0.getString("description");
+                            iconName[0] = position0.getString("icon");
+                            int vis = response.getInt("visibility");
+                            String name = response.getString( "name" );
+                            JSONObject mainObject = response.getJSONObject("main");
+                            double current = mainObject.getDouble("temp");
+                            double min = mainObject.getDouble("temp_min");
+                            double max = mainObject.getDouble("temp_max");
+                            int humidity = mainObject.getInt("humidity");
+
+
+                            binding.temp.setText("The current temperature is " + current);
+                            binding.temp.setVisibility(View.VISIBLE);
+                            binding.min.setText("The min temperature is " + min);
+                            binding.min.setVisibility(View.VISIBLE);
+                            binding.max.setText("The max temperature is " + max);
+                            binding.max.setVisibility(View.VISIBLE);
+                            binding.humidity.setText("The humidity is " + humidity);
+                            binding.humidity.setVisibility(View.VISIBLE);
+                            binding.descriptions.setText("The description is " + description);
+                            binding.descriptions.setVisibility(View.VISIBLE);
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    (error)->{});
+
+
+
+            String imageUrl = "https://openweathermap.org/img/w/" + iconName[0] + ".png";
+            ImageRequest imgReq = new ImageRequest(imageUrl, new Response.Listener<Bitmap>() {
+                @Override
+                public void onResponse(Bitmap bitmap) {
+                    // Do something with loaded bitmap...
+                    FileOutputStream fOut = null;
+                    try {
+                        fOut = openFileOutput( iconName[0] + ".png", Context.MODE_PRIVATE);
+
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                        fOut.flush();
+                        fOut.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+
+                    }
+
+                }
+            }, 1024, 1024, ImageView.ScaleType.CENTER, null, (error ) -> {
+
+            });
+
+
+            binding.icon.setImageBitmap();
+            queue.add(request);
+            queue.add(imgReq);
+
+
         });
+
+
+
     }
 
     /**
