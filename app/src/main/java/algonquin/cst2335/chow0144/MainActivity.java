@@ -113,12 +113,23 @@ public class MainActivity extends AppCompatActivity {
                                         fOut.close();
                                     } catch (IOException e) {
                                         e.printStackTrace();
-
+                                        return;
                                     }
 
+                                    // Load the image from the file after it has been saved
+                                    File file = new File( getFilesDir(), iconName + ".png");
+                                    if(file.exists()) {
+                                        try {
+                                            Bitmap theImage = BitmapFactory.decodeStream(openFileInput(iconName + ".png"));
+                                            binding.icon.setImageBitmap(theImage);
+                                            binding.icon.setVisibility(View.VISIBLE);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }, 1024, 1024, ImageView.ScaleType.CENTER, null, (error ) -> {
-
+                                // Handle errors here...
                             });
                             queue.add(imgReq);
 
